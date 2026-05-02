@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#09111f">
+<meta name="format-detection" content="telephone=no">
+<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; frame-src 'none'; object-src 'none';">
+<meta name="referrer" content="no-referrer">
+<title>Conversaciones en Inglés</title>
+<style id="fonts-preload">
+/* Fuentes del sistema Android como base (funcionan offline en APK) */
+/* Bangers -> fallback display impactante */
+/* Nunito -> Roboto disponible en todos los Android */
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="all" onerror="this.remove()">
+<style>
+:root{
+  --bg:#09111f;--surface:#111c2e;--card:#162035;--border:#1e2f4a;
+  --yellow:#FBBF24;--red:#EF4444;--green:#10B981;--blue:#3B82F6;
+  --purple:#8B5CF6;--pink:#EC4899;--orange:#F97316;--teal:#14B8A6;
+  --text:#F1F5F9;--muted:#64748B;--radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Roboto','Noto Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;overflow-y:auto}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 0% 0%,rgba(59,130,246,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 100% 100%,rgba(139,92,246,.07) 0%,transparent 55%);
+  pointer-events:none;z-index:0}
+
+header{position:relative;z-index:10;background:linear-gradient(135deg,#0c1527 0%,#141d35 100%);
+  border-bottom:3px solid var(--yellow);padding:26px 20px 18px;text-align:center}
+header h1{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:clamp(1.9rem,5.5vw,3.2rem);
+  letter-spacing:3px;color:var(--yellow);text-shadow:3px 3px 0 rgba(239,68,68,.45);margin-bottom:5px}
+header p{color:var(--muted);font-size:.88rem;font-weight:700}
+.creator{display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  padding:5px 14px;border-radius:50px;
+  background:rgba(251,191,36,.1);border:1.5px solid rgba(251,191,36,.3);
+  font-size:.78rem;font-weight:900;color:var(--yellow);letter-spacing:.5px}
+
+#audioBar{position:relative;z-index:10;padding:9px 16px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:.8rem;font-weight:800;transition:all .3s;
+  background:rgba(16,185,129,.08);border-bottom:1px solid rgba(16,185,129,.25);color:#10B981}
+#audioBar.error{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#EF4444}
+#audioBar.speaking{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#60A5FA}
+#audioBar.ready{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.25);color:#10B981}
+.pulse{width:9px;height:9px;border-radius:50%;background:currentColor;flex-shrink:0;
+  animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+
+.nav-wrap{position:relative;z-index:10;overflow-x:auto;padding:14px 12px 6px;scrollbar-width:none}
+.nav-wrap::-webkit-scrollbar{display:none}
+.nav{display:flex;gap:7px;width:max-content;margin:0 auto;padding-bottom:4px}
+.nav-btn{padding:7px 15px;border-radius:50px;border:2px solid var(--border);
+  background:var(--surface);color:var(--muted);cursor:pointer;
+  font-family:'Nunito','Roboto','Noto Sans',sans-serif;font-weight:800;font-size:.78rem;
+  transition:all .18s;white-space:nowrap}
+.nav-btn:hover{border-color:var(--yellow);color:var(--yellow)}
+.nav-btn.active{background:var(--yellow);border-color:var(--yellow);
+  color:#09111f;box-shadow:0 4px 14px rgba(251,191,36,.35)}
+
+main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:0 14px 70px}
+.topic-section{display:none}
+.topic-section.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.topic-header{display:flex;align-items:center;gap:12px;padding:24px 0 14px}
+.topic-icon{font-size:2.4rem;line-height:1}
+.topic-title{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.7rem;letter-spacing:2px;
+  color:var(--yellow);text-shadow:2px 2px 0 rgba(239,68,68,.35)}
+.topic-desc{font-size:.8rem;color:var(--muted);font-weight:700;margin-top:2px}
+
+.tips-block{background:rgba(251,191,36,.05);border:1.5px solid rgba(251,191,36,.18);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+.tips-block-title{font-size:.72rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:1px;color:var(--yellow);margin-bottom:8px}
+.phrase-card{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;padding:10px 13px;margin-bottom:7px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  transition:border-color .18s,transform .15s}
+.phrase-card:hover{border-color:var(--yellow);transform:translateX(3px)}
+.phrase-card.lit{border-color:var(--green);background:rgba(16,185,129,.07)}
+.phrase-texts{flex:1}
+.phrase-en{font-weight:800;font-size:.92rem;color:var(--text)}
+.phrase-es{font-size:.74rem;color:var(--muted);font-style:italic;margin-top:2px}
+.phrase-pro{font-size:.74rem;color:var(--yellow);font-weight:800;margin-top:2px}
+.play-icon{width:30px;height:30px;border-radius:50%;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;
+  transition:background .18s}
+.phrase-card:hover .play-icon,.phrase-card.lit .play-icon{background:var(--yellow);color:#000}
+
+.scenario{background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+.scenario:hover{border-color:rgba(251,191,36,.25)}
+.scenario-header{padding:13px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;background:rgba(255,255,255,.02)}
+.scenario-title{font-weight:900;font-size:.95rem;color:var(--text)}
+.chevron{color:var(--muted);font-size:1rem;transition:transform .3s}
+.scenario.open .chevron{transform:rotate(180deg)}
+.scenario-body{display:none;padding:16px}
+.scenario.open .scenario-body{display:block}
+
+.dialogue{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.line{display:flex;gap:10px;align-items:flex-start}
+.line.b{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.line.a .avatar{background:linear-gradient(135deg,#3B82F6,#6366F1)}
+.line.b .avatar{background:linear-gradient(135deg,#10B981,#059669)}
+.bubble{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:9px 13px;max-width:calc(100% - 54px);flex:1;
+  cursor:pointer;transition:border-color .18s,transform .12s}
+.bubble:hover{border-color:var(--yellow);transform:scale(1.01)}
+.bubble.lit{border-color:var(--green)!important;background:rgba(16,185,129,.07)}
+.line.a .bubble{border-radius:3px 12px 12px 12px}
+.line.b .bubble{border-radius:12px 3px 12px 12px;text-align:right}
+.bubble-en{font-weight:800;font-size:.9rem;color:var(--text);margin-bottom:3px;line-height:1.4}
+.bubble-es{font-size:.72rem;font-weight:600;color:var(--muted);font-style:italic}
+.bubble-pro{font-size:.72rem;font-weight:800;color:var(--yellow);margin-top:3px}
+
+.hint{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.22);
+  border-radius:10px;padding:10px 13px;margin-bottom:13px;
+  font-size:.77rem;color:var(--muted);line-height:1.6}
+.hint strong{color:var(--text)}
+.btn-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.speak-all-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));border:none;
+  border-radius:50px;color:#fff;font-family:'Nunito','Roboto','Noto Sans',sans-serif;font-weight:900;
+  font-size:.84rem;cursor:pointer;transition:transform .2s,box-shadow .2s;
+  box-shadow:0 4px 14px rgba(59,130,246,.3)}
+.speak-all-btn:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(59,130,246,.45)}
+.speak-all-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.stop-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
+  background:rgba(239,68,68,.15);border:1.5px solid rgba(239,68,68,.35);
+  border-radius:50px;color:#EF4444;font-family:'Nunito','Roboto','Noto Sans',sans-serif;font-weight:900;
+  font-size:.84rem;cursor:pointer;transition:all .2s}
+.stop-btn:hover{background:rgba(239,68,68,.25)}
+
+footer{position:relative;z-index:10;text-align:center;padding:16px;
+  color:#1e2f4a;font-size:.78rem;font-weight:700;border-top:1px solid var(--border)}
+@media(max-width:480px){.bubble-en{font-size:.84rem}.topic-title{font-size:1.4rem}}
+
+/* ── ABECEDARIO & NÚMEROS ── */
+.alpha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px;margin-bottom:20px}
+.alpha-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px 6px;text-align:center;cursor:pointer;transition:border-color .18s,transform .15s;user-select:none}
+.alpha-card:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.alpha-card.lit{border-color:var(--green);background:rgba(16,185,129,.08)}
+.alpha-letter{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.9rem;letter-spacing:1px;color:var(--yellow);line-height:1;margin-bottom:2px}
+.alpha-word{font-size:.62rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.alpha-pro{font-size:.65rem;font-weight:800;color:var(--blue);margin-top:2px}
+.num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.num-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px 14px;cursor:pointer;transition:border-color .18s,transform .15s;
+  display:flex;align-items:center;gap:10px;user-select:none}
+.num-card:hover{border-color:var(--yellow);transform:translateY(-2px)}
+.num-card.lit{border-color:var(--green);background:rgba(16,185,129,.08)}
+.num-digit{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.6rem;color:var(--yellow);min-width:40px;text-align:center;line-height:1}
+.num-texts{flex:1}
+.num-en{font-weight:900;font-size:.88rem;color:var(--text)}
+.num-pro{font-size:.68rem;font-weight:800;color:var(--blue);margin-top:2px}
+.section-subtitle{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.2rem;letter-spacing:1.5px;
+  color:var(--text);margin:22px 0 10px;padding-left:10px;border-left:4px solid var(--yellow)}
+.speak-all-alpha{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;
+  background:linear-gradient(135deg,var(--teal),var(--blue));border:none;
+  border-radius:50px;color:#fff;font-family:'Nunito','Roboto','Noto Sans',sans-serif;font-weight:900;
+  font-size:.82rem;cursor:pointer;margin-bottom:14px;
+  box-shadow:0 4px 14px rgba(20,184,166,.3);transition:transform .2s}
+.speak-all-alpha:hover{transform:translateY(-2px)}
+
+/* ── ABECEDARIO & NÚMEROS ── */
+.alpha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px;margin-bottom:20px}
+.alpha-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:12px 6px;text-align:center;cursor:pointer;transition:border-color .18s,transform .15s;user-select:none}
+.alpha-card:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.alpha-card.lit{border-color:var(--green);background:rgba(16,185,129,.08)}
+.alpha-letter{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:2rem;letter-spacing:1px;color:var(--yellow);line-height:1;margin-bottom:3px}
+.alpha-word{font-size:.63rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.alpha-pro{font-size:.66rem;font-weight:800;color:var(--blue);margin-top:2px}
+.num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:20px}
+.num-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:11px 13px;cursor:pointer;transition:border-color .18s,transform .15s;
+  display:flex;align-items:center;gap:10px;user-select:none}
+.num-card:hover{border-color:var(--yellow);transform:translateY(-2px)}
+.num-card.lit{border-color:var(--green);background:rgba(16,185,129,.08)}
+.num-digit{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.55rem;color:var(--yellow);min-width:42px;text-align:center;line-height:1}
+.num-texts{flex:1}
+.num-en{font-weight:900;font-size:.87rem;color:var(--text)}
+.num-pro{font-size:.68rem;font-weight:800;color:var(--blue);margin-top:2px}
+.section-subtitle{font-family:'Bangers','Roboto Condensed','Arial Black',cursive,sans-serif;font-size:1.15rem;letter-spacing:1.5px;
+  color:var(--text);margin:20px 0 10px;padding-left:10px;border-left:4px solid var(--yellow)}
+.speak-all-alpha{display:inline-flex;align-items:center;gap:7px;padding:8px 17px;
+  background:linear-gradient(135deg,var(--teal),var(--blue));border:none;
+  border-radius:50px;color:#fff;font-family:'Nunito','Roboto','Noto Sans',sans-serif;font-weight:900;
+  font-size:.81rem;cursor:pointer;box-shadow:0 4px 14px rgba(20,184,166,.28);transition:transform .2s}
+.speak-all-alpha:hover{transform:translateY(-2px)}
+.speak-all-alpha:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── OPTIMIZACIONES WEBVIEW / APK ── */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button,.nav-btn,.phrase-card,.bubble,.alpha-card,.num-card,.scenario-header{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  -webkit-user-select:none;user-select:none;
+}
+input,textarea{-webkit-user-select:text;user-select:text}
+/* Scrollbar oculto en WebView */
+::-webkit-scrollbar{display:none}
+* {scrollbar-width:none}
+</style>
+
+<script>
+/* ══════════════════════════════════════════
+   PROTECCIÓN ANTI-PUBLICIDAD (WebView Safe)
+   ══════════════════════════════════════════ */
+(function(){
+  'use strict';
+  // Selectores de elementos de publicidad a eliminar del DOM
+  const AD_SEL=[
+    'iframe[src*="doubleclick"]','iframe[src*="googlesyndication"]',
+    'iframe[src*="adnxs"]','iframe[src*="amazon-adsystem"]',
+    'ins.adsbygoogle','div[id*="google_ads"]','div[class*="ad-banner"]',
+    'div[id*="ad-container"]','div[class*="advertisement"]',
+    '[data-ad]','[data-adunit]','script[src*="googlesyndication"]',
+    'script[src*="googletagmanager"]','script[src*="doubleclick"]',
+  ];
+  function removeAds(root){
+    AD_SEL.forEach(sel=>{ try{ root.querySelectorAll(sel).forEach(el=>el.remove()); }catch(e){} });
+  }
+  const obs=new MutationObserver(ms=>{
+    ms.forEach(m=>m.addedNodes.forEach(node=>{
+      if(node.nodeType===1){
+        AD_SEL.forEach(sel=>{ try{ if(node.matches&&node.matches(sel))node.remove(); }catch(e){} });
+        removeAds(node);
+      }
+    }));
+  });
+  function start(){
+    try{ obs.observe(document.body||document.documentElement,{childList:true,subtree:true}); }catch(e){}
+    removeAds(document);
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',start); }else{ start(); }
+  // Bloquear window.open (popups)
+  const _open=window.open;
+  window.open=function(url,t,f){
+    const AD=['doubleclick','googlesyndication','adnxs','taboola','outbrain','exoclick','popads','popcash'];
+    if(url&&AD.some(d=>url.includes(d))) return null;
+    return _open&&_open.call(window,url,t,f);
+  };
+})();
+</script>
+</head>
+<body>
+
+<header>
+  <h1>💬 CONVERSACIONES EN INGLÉS</h1>
+  <p>Toca cualquier frase para escucharla · Pronunciación escrita en español</p>
+  <div class="creator">✨ Creado por Janer Figueroa</div>
+</header>
+
+<div id="audioBar">
+  <div class="pulse"></div>
+  <span id="audioMsg">Cargando voces... toca cualquier frase para activar</span>
+</div>
+
+<div class="nav-wrap"><div class="nav" id="nav"></div></div>
+<main id="main"></main>
+<footer>🔊 Toca cada burbuja · Repite en voz alta para practicar · ▶️ Escucha el diálogo completo</footer>
+
+<script>
+/* ─────────────────────────────────────────
+   MOTOR DE AUDIO — robusto, compatible iOS/Android/Desktop
+   ─────────────────────────────────────────*/
+const synth = window.speechSynthesis;
+let voices = [];
+let engVoice = null;
+let activeEl = null;
+let playQueue = [];
+let playingAll = false;
+
+function setBar(msg, cls = 'ready') {
+  document.getElementById('audioBar').className = cls;
+  document.getElementById('audioMsg').textContent = msg;
+}
+
+function loadVoices() {
+  voices = synth.getVoices();
+  if (!voices.length) return;
+  engVoice =
+    voices.find(v => v.lang === 'en-US' && /google/i.test(v.name)) ||
+    voices.find(v => v.lang === 'en-US') ||
+    voices.find(v => v.lang.startsWith('en')) ||
+    voices[0];
+  const name = engVoice ? engVoice.name.split(' ').slice(0, 3).join(' ') : 'default';
+  setBar(`🔊 Audio listo · voz: ${name}`, 'ready');
+}
+
+// Cargar voces (Chrome necesita el evento, Safari las tiene al instante)
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+loadVoices();
+setTimeout(loadVoices, 500);
+setTimeout(loadVoices, 1500); // tercer intento para Safari móvil
+
+function clearLit() {
+  document.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
+}
+
+function cancelSynth() {
+  synth.cancel();
+  clearLit();
+  playingAll = false;
+  playQueue = [];
+  if (activeEl) { activeEl.classList.remove('lit'); activeEl = null; }
+}
+
+/* Habla UN texto. Llama onEnd cuando termina. */
+function doSpeak(text, el, onEnd) {
+  synth.cancel();
+  clearLit();
+
+  if (el) { el.classList.add('lit'); activeEl = el; }
+
+  // Pequeño delay — evita el bug de Chrome donde cancel() no libera a tiempo
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.80;
+    u.pitch = 1.0;
+    u.volume = 1.0;
+    if (engVoice) u.voice = engVoice;
+
+    u.onstart = () => setBar(`🔊 "${text.slice(0, 45)}${text.length > 45 ? '…' : ''}"`, 'speaking');
+    u.onend = () => {
+      if (el) el.classList.remove('lit');
+      setBar('✅ Toca otra frase', 'ready');
+      if (onEnd) onEnd();
+    };
+    u.onerror = (e) => {
+      if (el) el.classList.remove('lit');
+      if (e.error !== 'interrupted' && e.error !== 'canceled') {
+        setBar(`⚠️ Error: ${e.error}`, 'error');
+      } else {
+        setBar('⏹ Detenido', 'ready');
+      }
+      if (onEnd) onEnd();
+    };
+
+    synth.speak(u);
+
+    // Watchdog: iOS a veces se congela, forzar siguiente después de timeout
+    const maxMs = Math.max(text.length * 120, 3000);
+    setTimeout(() => { if (synth.speaking) { /* sigue bien */ } }, maxMs);
+
+  }, 100);
+}
+
+/* Habla UNA frase (botón individual) */
+function speakOne(text, el) {
+  if (!voices.length) loadVoices();
+  playingAll = false;
+  playQueue = [];
+  doSpeak(text, el, null);
+}
+
+/* Habla TODA la lista en secuencia */
+function speakAll(items, btnEl) {
+  cancelSynth();
+  playingAll = true;
+  if (btnEl) btnEl.disabled = true;
+  let i = 0;
+
+  function next() {
+    if (!playingAll || i >= items.length) {
+      clearLit();
+      playingAll = false;
+      if (btnEl) btnEl.disabled = false;
+      setBar('✅ Diálogo completo', 'ready');
+      return;
+    }
+    const item = items[i++];
+    doSpeak(item.text, item.el, () => setTimeout(next, 450));
+  }
+  next();
+}
+
+function stopAll() {
+  cancelSynth();
+  // Re-enable any disabled buttons
+  document.querySelectorAll('.speak-all-btn').forEach(b => b.disabled = false);
+  setBar('⏹ Detenido', 'ready');
+}
+
+/* ─────────────────────────────────────────
+   DATOS — temas de conversación
+   ─────────────────────────────────────────*/
+const TOPICS = [
+  {
+    id:'manana', label:'🌅 Rutina diaria', icon:'🌅',
+    desc:'Conversaciones de la mañana y la vida en casa',
+    tips:[
+      {en:"What time do you wake up?", pro:"wát táim du yu wéik ap", es:"¿A qué hora te levantas?"},
+      {en:"I wake up at 6 AM", pro:"ai wéik ap at síks éi em", es:"Me levanto a las 6 AM"},
+      {en:"Did you sleep well?", pro:"did yu slíp wel", es:"¿Dormiste bien?"},
+      {en:"I'm so tired today", pro:"aim sou táierd tudéi", es:"Estoy muy cansado hoy"},
+      {en:"Have you had breakfast?", pro:"jav yu jad brékfast", es:"¿Ya desayunaste?"},
+      {en:"I'm running late", pro:"aim ránin léit", es:"Voy tarde"},
+      {en:"See you later!", pro:"si yu léiter", es:"¡Hasta luego!"},
+      {en:"Have a great day!", pro:"jav a gréit déi", es:"¡Que tengas un gran día!"},
+    ],
+    scenarios:[
+      {
+        title:"☀️ Buenos días en casa",
+        lines:[
+          {who:'a', en:"Good morning! Did you sleep well?", es:"¡Buenos días! ¿Dormiste bien?", pro:"gud mórnin! did yu slíp wel"},
+          {who:'b', en:"Not really. I went to bed very late.", es:"La verdad no. Me fui a dormir muy tarde.", pro:"not ríali. ai went tu bed véri léit"},
+          {who:'a', en:"What time did you wake up?", es:"¿A qué hora te levantaste?", pro:"wát táim did yu wéik ap"},
+          {who:'b', en:"At 6:30. I'm so tired. Is the coffee ready?", es:"A las 6:30. Estoy muy cansado. ¿Está listo el café?", pro:"at síks zérti. aim sou táierd. is de kófi rédi"},
+          {who:'a', en:"Yes! It's on the table. Do you want some toast?", es:"¡Sí! Está en la mesa. ¿Quieres pan tostado?", pro:"yes! its on de téibol. du yu wont sam toust"},
+          {who:'b', en:"Yes please. And some orange juice too.", es:"Sí por favor. Y un poco de jugo de naranja también.", pro:"yes plís. and sam óranch chus tu"},
+          {who:'a', en:"Here you go. What are your plans for today?", es:"Aquí tienes. ¿Cuáles son tus planes para hoy?", pro:"jír yu gou. wát ar yor plans for tudéi"},
+          {who:'b', en:"I have a meeting at 9 and then I go to the gym.", es:"Tengo una reunión a las 9 y luego voy al gimnasio.", pro:"ai jav a mítin at náin and den ai gou tu de chim"},
+        ]
+      },
+      {
+        title:"🚿 Apuros para salir",
+        lines:[
+          {who:'a', en:"Hurry up! We're going to be late!", es:"¡Apúrate! ¡Vamos a llegar tarde!", pro:"jári ap! wir góin tu bi léit"},
+          {who:'b', en:"Hold on! I can't find my keys!", es:"¡Espera! ¡No encuentro mis llaves!", pro:"jould on! ai kant fáind mai kíis"},
+          {who:'a', en:"They're on the kitchen counter, next to the fridge.", es:"Están en el mostrador de la cocina, al lado de la nevera.", pro:"deir on de kítchen káunter, next tu de frích"},
+          {who:'b', en:"Oh, found them! Let me just grab my bag.", es:"¡Ah, las encontré! Déjame agarrar mi bolsa.", pro:"ou, fáund dem! let mi chast grab mai bag"},
+          {who:'a', en:"Did you eat breakfast? We don't have time now.", es:"¿Desayunaste? No tenemos tiempo ahora.", pro:"did yu ít brékfast? wi dont jav táim náu"},
+          {who:'b', en:"No, I'll grab something on the way.", es:"No, agarraré algo en el camino.", pro:"nou, ail grab sámziŋ on de wéi"},
+          {who:'a', en:"Okay, let's go! Don't forget your umbrella, it might rain.", es:"Okay, ¡vámonos! No olvides tu paraguas, puede llover.", pro:"okéi, lets gou! dont forgét yor ambréla, it máit réin"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'amigos', label:'👫 Con amigos', icon:'👫',
+    desc:'Charlas informales, planes y bromas entre amigos',
+    tips:[
+      {en:"What are you up to?", pro:"wát ar yu ap tu", es:"¿Qué andas haciendo?"},
+      {en:"Long time no see!", pro:"long táim nou si", es:"¡Cuánto tiempo sin verte!"},
+      {en:"Do you want to hang out?", pro:"du yu wont tu jang áut", es:"¿Quieres salir a pasar el rato?"},
+      {en:"That's hilarious!", pro:"dáts jilérias", es:"¡Eso es muy gracioso!"},
+      {en:"I'm in!", pro:"aim in", es:"¡Me apunto!"},
+      {en:"No way!", pro:"nou wéi", es:"¡No puede ser!"},
+      {en:"Are you serious?", pro:"ar yu sírias", es:"¿En serio?"},
+      {en:"I'll be there in 10 minutes", pro:"ail bi der in ten mínits", es:"Llego en 10 minutos"},
+    ],
+    scenarios:[
+      {
+        title:"📱 Organizando planes",
+        lines:[
+          {who:'a', en:"Hey! What are you up to this weekend?", es:"¡Oye! ¿Qué vas a hacer este fin de semana?", pro:"jéi! wát ar yu ap tu dis wíkend"},
+          {who:'b', en:"Nothing much! Why? Do you have something in mind?", es:"¡No mucho! ¿Por qué? ¿Tienes algo en mente?", pro:"náziŋ mach! wái? du yu jav sámziŋ in máind"},
+          {who:'a', en:"There's a new movie at the cinema. Want to go Saturday?", es:"Hay una película nueva en el cine. ¿Quieres ir el sábado?", pro:"ders a niu múvi at de sínema. wont tu gou sáterdei"},
+          {who:'b', en:"I'm in! What time? And can Sara come too?", es:"¡Me apunto! ¿A qué hora? ¿Y puede venir Sara también?", pro:"aim in! wát táim? and kan Sára kam tu"},
+          {who:'a', en:"Of course! The movie starts at 7. Let's meet at 6:30.", es:"¡Claro que sí! La película empieza a las 7. Juntémonos a las 6:30.", pro:"of kors! de múvi starts at séven. lets mít at síks zérti"},
+          {who:'b', en:"Perfect. Should we eat before or after the movie?", es:"Perfecto. ¿Comemos antes o después de la película?", pro:"pérfekt. shud wi ít bifór or áfter de múvi"},
+          {who:'a', en:"Let's eat after. I know a great pizza place nearby.", es:"Comamos después. Conozco un lugar de pizza genial cerca.", pro:"lets ít áfter. ai nou a gréit pítsa pléis nírbai"},
+          {who:'b', en:"Sounds perfect! See you Saturday. I can't wait!", es:"¡Suena perfecto! Nos vemos el sábado. ¡No puedo esperar!", pro:"sáunds pérfekt! si yu sáterdei. ai kant wéit"},
+        ]
+      },
+      {
+        title:"😂 Chismeando y riendo",
+        lines:[
+          {who:'a', en:"Guess what happened to me today!", es:"¡Adivina qué me pasó hoy!", pro:"gues wát jápend tu mi tudéi"},
+          {who:'b', en:"What? Tell me everything!", es:"¿Qué? ¡Cuéntame todo!", pro:"wát? tel mi évriziŋ"},
+          {who:'a', en:"I ran into my ex at the supermarket. So awkward!", es:"Me encontré con mi ex en el súper. ¡Tan incómodo!", pro:"ai ran intu mai ex at de súpermarket. sou ókwerd"},
+          {who:'b', en:"No way! What did you do?", es:"¡No puede ser! ¿Qué hiciste?", pro:"nou wéi! wát did yu du"},
+          {who:'a', en:"I pretended I didn't see them and hid behind the cereal boxes!", es:"Fingí que no los vi y me escondí detrás de las cajas de cereal.", pro:"ai priténded ai dínt si dem and jid bijáind de sírial bóksis"},
+          {who:'b', en:"That's hilarious! You're so dramatic!", es:"¡Eso es demasiado gracioso! ¡Eres tan dramático!", pro:"dáts jilérias! yur sou dramátik"},
+          {who:'a', en:"I know! But it worked, they didn't see me.", es:"¡Lo sé! Pero funcionó, no me vieron.", pro:"ai nou! bat it werkt, dei dínt si mi"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'trabajo', label:'💻 En el trabajo', icon:'💻',
+    desc:'Reuniones, compañeros y el día a día laboral',
+    tips:[
+      {en:"Can we schedule a meeting?", pro:"kan wi skéchiuol a mítin", es:"¿Podemos agendar una reunión?"},
+      {en:"I'll send you the report by noon", pro:"ail send yu de ripórt bai nun", es:"Te mando el reporte al mediodía"},
+      {en:"The deadline is tomorrow", pro:"de dédlain is tumórou", es:"La fecha límite es mañana"},
+      {en:"Could you repeat that, please?", pro:"kud yu ripít dat, plís", es:"¿Podría repetir eso, por favor?"},
+      {en:"I agree with you", pro:"ai agrí wid yu", es:"Estoy de acuerdo contigo"},
+      {en:"Let me check and get back to you", pro:"let mi chek and guet bak tu yu", es:"Déjame revisar y te confirmo"},
+      {en:"Good job!", pro:"gud chob", es:"¡Buen trabajo!"},
+      {en:"I'm working from home today", pro:"aim wérkin from jóum tudéi", es:"Hoy trabajo desde casa"},
+    ],
+    scenarios:[
+      {
+        title:"📊 Reunión de trabajo",
+        lines:[
+          {who:'b', en:"Good morning everyone. Let's get started. Carlos, can you give us an update?", es:"Buenos días a todos. Comencemos. Carlos, ¿puedes darnos una actualización?", pro:"gud mórnin évriwan. lets guet stárted. Carlos, kan yu guiv as an apdeít"},
+          {who:'a', en:"Of course. We finished the project on time and the client is happy.", es:"Claro. Terminamos el proyecto a tiempo y el cliente está contento.", pro:"of kors. wi finisht de próchekt on táim and de kláient is jápi"},
+          {who:'b', en:"Excellent! What about the new proposal? Is it ready?", es:"¡Excelente! ¿Y la nueva propuesta? ¿Está lista?", pro:"éksalent! wát abáut de niu propósal? is it rédi"},
+          {who:'a', en:"Not yet. We need two more days. The deadline was pushed back.", es:"Aún no. Necesitamos dos días más. La fecha límite se pospuso.", pro:"not yet. wi níd tu mor déis. de dédlain wos pusht bak"},
+          {who:'b', en:"Okay. Make sure it's ready by Friday. Any other updates?", es:"Okay. Asegúrense de que esté lista el viernes. ¿Algo más?", pro:"okéi. méik shur its rédi bai fráidei. éni áder apdeíts"},
+          {who:'a', en:"Yes. I think we need to hire one more person for the team.", es:"Sí. Creo que necesitamos contratar a una persona más para el equipo.", pro:"yes. ai zink wi níd tu jáier wan mor pérson for de tím"},
+          {who:'b', en:"Let me check the budget and get back to you on that.", es:"Déjame revisar el presupuesto y te confirmo.", pro:"let mi chek de báchet and guet bak tu yu on dat"},
+        ]
+      },
+      {
+        title:"☕ En el descanso",
+        lines:[
+          {who:'a', en:"Hey! Are you going for coffee? I need a break.", es:"¡Oye! ¿Vas por café? Necesito un descanso.", pro:"jéi! ar yu góin for kófi? ai níd a bréik"},
+          {who:'b', en:"Yes! That meeting was so long. I'm exhausted.", es:"¡Sí! La reunión estuvo muy larga. Estoy agotado.", pro:"yes! dat mítin wos sou long. aim egzósted"},
+          {who:'a', en:"Tell me about it! How do you take your coffee?", es:"¡No me digas! ¿Cómo tomas tu café?", pro:"tel mi abáut it! jáu du yu téik yor kófi"},
+          {who:'b', en:"Black with one sugar. By the way, did you see the new project?", es:"Negro con un azúcar. Por cierto, ¿viste el nuevo proyecto?", pro:"blak wid wan shúgar. bai de wéi, did yu si de niu próchekt"},
+          {who:'a', en:"Not yet. Is it interesting?", es:"Todavía no. ¿Es interesante?", pro:"not yet. is it interéstin"},
+          {who:'b', en:"Very! I think we'll be working together on it.", es:"¡Mucho! Creo que trabajaremos juntos en él.", pro:"véri! ai zink wil bi wérkin tugéder on it"},
+          {who:'a', en:"That would be great! We make a good team.", es:"¡Eso sería genial! Hacemos un buen equipo.", pro:"dat wud bi gréit! wi méik a gud tím"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'vecinos', label:'🏘 Vecinos', icon:'🏘',
+    desc:'Charlar con vecinos y personas del barrio',
+    tips:[
+      {en:"Nice weather today, isn't it?", pro:"náis wéder tudéi, ísnt it", es:"Bonito clima hoy, ¿verdad?"},
+      {en:"Could you keep the noise down?", pro:"kud yu kíp de nóis dáun", es:"¿Podrías bajar el ruido?"},
+      {en:"Can I borrow some sugar?", pro:"kan ai bórou sam shúgar", es:"¿Me prestas un poco de azúcar?"},
+      {en:"The mail came for you", pro:"de méil kéim for yu", es:"Te llegó correspondencia"},
+      {en:"Is everything okay?", pro:"is évriziŋ okéi", es:"¿Todo bien?"},
+      {en:"We just moved in", pro:"wi chast muvd in", es:"Acabamos de mudarnos"},
+      {en:"Welcome to the building!", pro:"wélkam tu de bíldin", es:"¡Bienvenido al edificio!"},
+      {en:"The elevator is broken", pro:"di élivéitor is bróuken", es:"El ascensor está dañado"},
+    ],
+    scenarios:[
+      {
+        title:"🤝 Conociendo al vecino nuevo",
+        lines:[
+          {who:'b', en:"Hi! Are you the new neighbor from apartment 4B?", es:"¡Hola! ¿Eres el nuevo vecino del apartamento 4B?", pro:"jái! ar yu de niu néibor from apártment for bi"},
+          {who:'a', en:"Yes! We just moved in yesterday. I'm Marco.", es:"¡Sí! Nos mudamos ayer. Soy Marco.", pro:"yes! wi chast muvd in iésterdei. aim Márko"},
+          {who:'b', en:"Welcome! I'm Linda from 4A. How do you like the building so far?", es:"¡Bienvenido! Soy Linda del 4A. ¿Qué te parece el edificio?", pro:"wélkam! aim Linda from for éi. jáu du yu láik de bíldin sou far"},
+          {who:'a', en:"It's very nice! Very quiet too. Is it always like this?", es:"¡Es muy bonito! Muy tranquilo también. ¿Siempre es así?", pro:"its véri náis! véri kwáiet tu. is it ólweis láik dis"},
+          {who:'b', en:"Mostly yes. On weekends it can get a bit noisy.", es:"En su mayoría sí. Los fines de semana puede ponerse ruidoso.", pro:"móustli yes. on wíkends it kan guet a bit nóisi"},
+          {who:'a', en:"Good to know. Is there a laundry room in the building?", es:"Bueno saberlo. ¿Hay cuarto de lavandería en el edificio?", pro:"gud tu nou. is der a lóndri rum in de bíldin"},
+          {who:'b', en:"Yes, it's in the basement. Open from 7 AM to 10 PM.", es:"Sí, está en el sótano. Abierto de 7 AM a 10 PM.", pro:"yes, its in de béisment. óupen from séven éi em tu ten pi em"},
+          {who:'a', en:"Perfect! Thanks so much. Let's have coffee sometime!", es:"¡Perfecto! Muchas gracias. ¡Tomemos café algún día!", pro:"pérfekt! zanks sou mach. lets jav kófi sámtáim"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'clima', label:'🌤 Hablar del clima', icon:'🌤',
+    desc:'El tema más universal para iniciar conversación',
+    tips:[
+      {en:"What's the weather like today?", pro:"wáts de wéder láik tudéi", es:"¿Cómo está el clima hoy?"},
+      {en:"It's going to rain later", pro:"its góin tu réin léiter", es:"Va a llover más tarde"},
+      {en:"It's freezing outside!", pro:"its frísin áutsáid", es:"¡Hace un frío horrible afuera!"},
+      {en:"It's a beautiful day!", pro:"its a biútiful déi", es:"¡Es un día hermoso!"},
+      {en:"Bring an umbrella, just in case", pro:"brin an ambréla, chast in kéis", es:"Lleva paraguas, por si acaso"},
+      {en:"I love this weather", pro:"ai lav dis wéder", es:"Me encanta este clima"},
+      {en:"It's so humid today", pro:"its sou jiúmid tudéi", es:"Está muy húmedo hoy"},
+      {en:"The storm is coming", pro:"de storm is kámin", es:"La tormenta se acerca"},
+    ],
+    scenarios:[
+      {
+        title:"☔ Conversando sobre el clima",
+        lines:[
+          {who:'a', en:"Can you believe this weather? It's so hot!", es:"¿Puedes creer este clima? ¡Hace tanto calor!", pro:"kan yu bilív dis wéder? its sou jot"},
+          {who:'b', en:"I know! It's 38 degrees today. Absolutely crazy.", es:"¡Lo sé! Hoy hay 38 grados. Absolutamente loco.", pro:"ai nou! its zerti éit digrís tudéi. ábsolutli kréisi"},
+          {who:'a', en:"And it's so humid too. I can barely breathe.", es:"Y también está muy húmedo. Casi no puedo respirar.", pro:"and its sou jiúmid tu. ai kan béirli bríd"},
+          {who:'b', en:"I heard it might rain tomorrow. That would help.", es:"Escuché que puede llover mañana. Eso ayudaría.", pro:"ai herd it máit réin tumórou. dat wud jelp"},
+          {who:'a', en:"I hope so! I love the weather after it rains.", es:"¡Ojalá! Me encanta el clima después de que llueve.", pro:"ai joup sou! ai lav de wéder áfter it réins"},
+          {who:'b', en:"Same! So fresh and cool. Are you going out today?", es:"¡Igual! Tan fresco y frío. ¿Vas a salir hoy?", pro:"séim! sou fresh and kul. ar yu góin áut tudéi"},
+          {who:'a', en:"I have to. But I'll bring water and sunscreen.", es:"Tengo que hacerlo. Pero llevaré agua y protector solar.", pro:"ai jav tu. bat ail brin wóter and sánskriin"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'supermercado', label:'🛒 Supermercado', icon:'🛒',
+    desc:'Comprar alimentos y pedir ayuda en la tienda',
+    tips:[
+      {en:"Where can I find the bread?", pro:"wer kan ai fáind de bred", es:"¿Dónde puedo encontrar el pan?"},
+      {en:"Is this organic?", pro:"is dis orgánik", es:"¿Esto es orgánico?"},
+      {en:"Do you have a loyalty card?", pro:"du yu jav a lóialti kard", es:"¿Tienes tarjeta de membresía?"},
+      {en:"Can I get a bag, please?", pro:"kan ai guet a bag, plís", es:"¿Me puede dar una bolsa?"},
+      {en:"This is on sale", pro:"dis is on séil", es:"Esto está en oferta"},
+      {en:"Do you have this in another flavor?", pro:"du yu jav dis in anáder fléivor", es:"¿Tienen esto en otro sabor?"},
+      {en:"I need to check the expiration date", pro:"ai níd tu chek di ekspiréishon déit", es:"Necesito revisar la fecha de vencimiento"},
+      {en:"Paper or plastic bag?", pro:"péiper or plástik bag", es:"¿Bolsa de papel o plástico?"},
+    ],
+    scenarios:[
+      {
+        title:"🥦 Comprando en el supermercado",
+        lines:[
+          {who:'a', en:"Excuse me, where can I find the dairy products?", es:"Disculpe, ¿dónde puedo encontrar los productos lácteos?", pro:"ekskiús mi, wer kan ai fáind de déiri pródalts"},
+          {who:'b', en:"Aisle 5, at the back of the store, near the refrigerators.", es:"Pasillo 5, al fondo de la tienda, cerca de los refrigeradores.", pro:"áil faiv, at de bak of de stor, nír de rifricheréitors"},
+          {who:'a', en:"Thank you! And where are the cleaning products?", es:"¡Gracias! ¿Y dónde están los productos de limpieza?", pro:"zenk yu! and wer ar de klínin pródalts"},
+          {who:'b', en:"Aisle 9, on the left side.", es:"Pasillo 9, a la izquierda.", pro:"áil náin, on de left sáid"},
+          {who:'a', en:"Perfect. Do you have buy one get one free offers today?", es:"Perfecto. ¿Tienen ofertas de lleve dos pague uno hoy?", pro:"pérfekt. du yu jav bái wan guet wan frí ófers tudéi"},
+          {who:'b', en:"Yes! Yogurt and pasta are on special today. Check the signs.", es:"¡Sí! El yogur y la pasta están en especial hoy. Fíjese en los letreros.", pro:"yes! yógurt and pásta ar on spéshal tudéi. chek de sáins"},
+          {who:'a', en:"Great, I'll grab some. Thank you so much!", es:"Genial, agarraré un poco. ¡Muchas gracias!", pro:"gréit, ail grab sam. zenk yu sou mach"},
+          {who:'b', en:"Of course! Have a great shopping experience!", es:"¡Claro que sí! ¡Que tenga una buena experiencia!", pro:"of kors! jav a gréit shópin ekspiríense"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'gym', label:'💪 Gym y deporte', icon:'💪',
+    desc:'En el gimnasio y hablando de deporte',
+    tips:[
+      {en:"Do you work out often?", pro:"du yu werk áut óften", es:"¿Haces ejercicio seguido?"},
+      {en:"Can I use this machine?", pro:"kan ai iús dis mashín", es:"¿Puedo usar esta máquina?"},
+      {en:"How many sets do you have left?", pro:"jáu méni sets du yu jav left", es:"¿Cuántas series te quedan?"},
+      {en:"I go to the gym 4 times a week", pro:"ai gou tu de chim for táims a wík", es:"Voy al gimnasio 4 veces a la semana"},
+      {en:"My favorite sport is soccer", pro:"mai féivorit sport is sóker", es:"Mi deporte favorito es el fútbol"},
+      {en:"Did you watch the game last night?", pro:"did yu woch de guéim last náit", es:"¿Viste el partido anoche?"},
+      {en:"I'm trying to lose weight", pro:"aim tráiin tu lus wéit", es:"Estoy tratando de bajar de peso"},
+      {en:"Stretch before you exercise", pro:"strech bifór yu éksersáis", es:"Estira antes de ejercitarte"},
+    ],
+    scenarios:[
+      {
+        title:"🏋️ En el gimnasio",
+        lines:[
+          {who:'a', en:"Excuse me, are you done with this bench?", es:"Disculpa, ¿ya terminaste con esta banca?", pro:"ekskiús mi, ar yu dan wid dis bench"},
+          {who:'b', en:"I have two more sets. About 5 minutes. Is that okay?", es:"Me quedan dos series. Como 5 minutos. ¿Está bien?", pro:"ai jav tu mor sets. abáut faiv mínits. is dat okéi"},
+          {who:'a', en:"No problem! I'll start with cardio and come back.", es:"¡No hay problema! Empiezo con cardio y regreso.", pro:"nou próblem! ail start wid kárdio and kam bak"},
+          {who:'b', en:"Sounds good. Hey, do you come here often?", es:"Suena bien. Oye, ¿vienes aquí seguido?", pro:"sáunds gud. jéi, du yu kam jír óften"},
+          {who:'a', en:"About 4 times a week. I've been training for 6 months.", es:"Como 4 veces a la semana. Llevo entrenando 6 meses.", pro:"abáut for táims a wík. aiv bin tréinin for síks mánzs"},
+          {who:'b', en:"Wow, it shows! Do you have a trainer?", es:"¡Vaya, se nota! ¿Tienes entrenador?", pro:"wáu, it shous! du yu jav a tréiner"},
+          {who:'a', en:"No, I follow programs online. It works great!", es:"No, sigo programas en línea. ¡Funciona muy bien!", pro:"nou, ai fólou próugrams onláin. it werks gréit"},
+          {who:'b', en:"That's smart. Okay, the bench is yours now. Good workout!", es:"Qué inteligente. Okay, la banca es tuya ahora. ¡Buen entrenamiento!", pro:"dáts smart. okéi, de bench is yors náu. gud wérkáut"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'redes', label:'📲 Redes sociales', icon:'📲',
+    desc:'Mensajes, apps y tecnología cotidiana',
+    tips:[
+      {en:"Did you see my message?", pro:"did yu si mai mésach", es:"¿Viste mi mensaje?"},
+      {en:"I'll text you later", pro:"ail text yu léiter", es:"Te mando un mensaje después"},
+      {en:"Can you send me the link?", pro:"kan yu send mi de link", es:"¿Me puedes mandar el link?"},
+      {en:"My phone died", pro:"mai foun dáid", es:"Se me acabó la batería"},
+      {en:"I saw that on Instagram", pro:"ai só dat on ínstagram", es:"Vi eso en Instagram"},
+      {en:"Can I use your charger?", pro:"kan ai iús yor chárcher", es:"¿Puedo usar tu cargador?"},
+      {en:"My internet is so slow today", pro:"mai ínternet is sou slóu tudéi", es:"Mi internet está muy lento hoy"},
+      {en:"Let me take a picture!", pro:"let mi téik a píccher", es:"¡Déjame tomar una foto!"},
+    ],
+    scenarios:[
+      {
+        title:"📸 Hablando de redes sociales",
+        lines:[
+          {who:'a', en:"Did you see the video I sent you last night?", es:"¿Viste el video que te mandé anoche?", pro:"did yu si de vídio ai sent yu last náit"},
+          {who:'b', en:"No! My phone died and I was charging it all night.", es:"¡No! Se me apagó el teléfono y lo estuve cargando toda la noche.", pro:"nou! mai foun dáid and ai wos chárchin it ol náit"},
+          {who:'a', en:"Oh no! Well, I'll send it again. It's so funny.", es:"¡Ay no! Bueno, te lo mando de nuevo. Es muy gracioso.", pro:"ou nou! wel, ail send it agén. its sou fáni"},
+          {who:'b', en:"Okay! By the way, did you follow me on Instagram?", es:"¡Okay! Por cierto, ¿me seguiste en Instagram?", pro:"okéi! bai de wéi, did yu fólou mi on ínstagram"},
+          {who:'a', en:"Yes! I liked your last post. The beach photo was beautiful.", es:"¡Sí! Le di like a tu última publicación. La foto de la playa estaba hermosa.", pro:"yes! ai láikt yor last poust. de bích fóutou wos biútiful"},
+          {who:'b', en:"Thanks! I edited it with a new app. It's amazing.", es:"¡Gracias! La edité con una nueva aplicación. Es increíble.", pro:"zanks! ai édited it wid a niu ap. its améisin"},
+          {who:'a', en:"Can you send me the link to the app? I want to try it.", es:"¿Me puedes mandar el link de la app? Quiero probarla.", pro:"kan yu send mi de link tu de ap? ai wont tu trái it"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'transporte', label:'🚌 Bus y metro', icon:'🚌',
+    desc:'Usar transporte público y pedir ayuda en la calle',
+    tips:[
+      {en:"Does this bus go downtown?", pro:"das dis bas gou dáuntáun", es:"¿Este bus va al centro?"},
+      {en:"Where do I get off?", pro:"wer du ai guet of", es:"¿Dónde me bajo?"},
+      {en:"How much is the fare?", pro:"jáu mach is de fer", es:"¿Cuánto es el pasaje?"},
+      {en:"Is this seat taken?", pro:"is dis sit téiken", es:"¿Está ocupado este asiento?"},
+      {en:"Next stop, please", pro:"next stop, plís", es:"La próxima parada, por favor"},
+      {en:"I missed my stop", pro:"ai mist mai stop", es:"Me pasé de mi parada"},
+      {en:"How long until we arrive?", pro:"jáu long antíl wi aráiv", es:"¿Cuánto falta para llegar?"},
+      {en:"Can you let me through, please?", pro:"kan yu let mi zru, plís", es:"¿Me dejas pasar, por favor?"},
+    ],
+    scenarios:[
+      {
+        title:"🚌 En el autobús",
+        lines:[
+          {who:'a', en:"Excuse me, does this bus go to the city center?", es:"Disculpe, ¿este bus va al centro de la ciudad?", pro:"ekskiús mi, das dis bas gou tu de síti sénter"},
+          {who:'b', en:"Yes, but you need to transfer at Oak Station.", es:"Sí, pero necesitas hacer transbordo en la Estación Oak.", pro:"yes, bat yu níd tu tránsfer at ouk stéishon"},
+          {who:'a', en:"And how long does it take to get there?", es:"¿Y cuánto tarda en llegar hasta allá?", pro:"and jáu long das it téik tu guet der"},
+          {who:'b', en:"About 20 minutes by bus, then 5 more on the train.", es:"Como 20 minutos en bus, luego 5 más en el tren.", pro:"abáut tuénti mínits bai bas, den faiv mor on de tréin"},
+          {who:'a', en:"I see. Is this seat taken?", es:"Entiendo. ¿Está ocupado este asiento?", pro:"ai si. is dis sit téiken"},
+          {who:'b', en:"No, go ahead! Where are you headed?", es:"No, ¡adelante! ¿Para dónde vas?", pro:"nou, gou ajéd! wer ar yu jéded"},
+          {who:'a', en:"I'm going to the museum. It's my first time in this city.", es:"Voy al museo. Es mi primera vez en esta ciudad.", pro:"aim góin tu de miuséom. its mai ferst táim in dis síti"},
+          {who:'b', en:"Welcome! It's a great city. You'll love the museum!", es:"¡Bienvenido! Es una gran ciudad. ¡Te va a encantar el museo!", pro:"wélkam! its a gréit síti. yul lav de miuséom"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'citas', label:'❤️ Citas y amor', icon:'❤️',
+    desc:'Invitar a salir y conversaciones románticas',
+    tips:[
+      {en:"Would you like to go out with me?", pro:"wud yu láik tu gou áut wid mi", es:"¿Te gustaría salir conmigo?"},
+      {en:"You look amazing!", pro:"yu luk améisin", es:"¡Te ves increíble!"},
+      {en:"I had a great time tonight", pro:"ai jad a gréit táim tunáit", es:"La pasé muy bien esta noche"},
+      {en:"Can I call you sometime?", pro:"kan ai kol yu sámtáim", es:"¿Puedo llamarte algún día?"},
+      {en:"I really like you", pro:"ai ríali láik yu", es:"Me gustas mucho"},
+      {en:"Are you single?", pro:"ar yu síngol", es:"¿Estás soltero/a?"},
+      {en:"Let's do this again", pro:"lets du dis agén", es:"Repitamos esto"},
+      {en:"I love you", pro:"ai lav yu", es:"Te amo"},
+    ],
+    scenarios:[
+      {
+        title:"🌹 Primera cita",
+        lines:[
+          {who:'a', en:"You look amazing! I'm so glad you could make it tonight.", es:"¡Te ves increíble! Me alegra mucho que hayas podido venir esta noche.", pro:"yu luk améisin! aim sou glad yu kud méik it tunáit"},
+          {who:'b', en:"Thank you! You look great too. This restaurant is so nice.", es:"¡Gracias! Tú también te ves muy bien. Este restaurante es muy bonito.", pro:"zenk yu! yu luk gréit tu. dis réstoran is sou náis"},
+          {who:'a', en:"I'm glad you like it. I was a little nervous about choosing the place.", es:"Me alegra que te guste. Estaba un poco nervioso eligiendo el lugar.", pro:"aim glad yu láik it. ai wos a lítol nérvas abáut chúsin de pléis"},
+          {who:'b', en:"Don't be nervous! It's perfect. Tell me more about yourself.", es:"¡No te pongas nervioso! Es perfecto. Cuéntame más sobre ti.", pro:"dont bi nérvas! its pérfekt. tel mi mor abáut yorself"},
+          {who:'a', en:"Well, I'm a teacher. I love music and hiking on weekends.", es:"Bueno, soy maestro. Me encanta la música y el senderismo los fines de semana.", pro:"wel, aim a tícher. ai lav miúsik and jáikin on wíkends"},
+          {who:'b', en:"I love hiking too! Maybe we could go together sometime.", es:"¡A mí también me encanta! Tal vez podríamos ir juntos algún día.", pro:"ai lav jáikin tu! méibi wi kud gou tugéder sámtáim"},
+          {who:'a', en:"I would love that! I had such a great time tonight.", es:"¡Me encantaría! La pasé genial esta noche.", pro:"ai wud lav dat! ai jad sach a gréit táim tunáit"},
+          {who:'b', en:"Me too. Can I see you again this weekend?", es:"Yo también. ¿Puedo verte de nuevo este fin de semana?", pro:"mi tu. kan ai si yu agén dis wíkend"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'peluqueria', label:'💈 Peluquería', icon:'💈',
+    desc:'Pedir un corte de cabello y servicios de belleza',
+    tips:[
+      {en:"I'd like a haircut, please", pro:"aid láik a jérkat, plís", es:"Quisiera un corte de cabello, por favor"},
+      {en:"Just a trim, please", pro:"chast a trim, plís", es:"Solo un recorte, por favor"},
+      {en:"Not too short", pro:"not tu short", es:"No muy corto"},
+      {en:"How long is the wait?", pro:"jáu long is de wéit", es:"¿Cuánto tiempo de espera?"},
+      {en:"Can you wash my hair too?", pro:"kan yu wosh mai jer tu", es:"¿Me puede lavar el cabello también?"},
+      {en:"A little shorter on the sides", pro:"a lítol shorter on de sáids", es:"Un poco más corto en los lados"},
+      {en:"That looks great! Thank you.", pro:"dat luks gréit! zenk yu", es:"¡Se ve genial! Gracias."},
+      {en:"How much do I owe you?", pro:"jáu mach du ai ou yu", es:"¿Cuánto le debo?"},
+    ],
+    scenarios:[
+      {
+        title:"✂️ En la peluquería",
+        lines:[
+          {who:'b', en:"Hello! Welcome. Do you have an appointment?", es:"¡Hola! Bienvenido. ¿Tienes cita?", pro:"jelóu! wélkam. du yu jav an apóintment"},
+          {who:'a', en:"No, I don't. How long is the wait?", es:"No, no tengo. ¿Cuánto tiempo de espera?", pro:"nou, ai dont. jáu long is de wéit"},
+          {who:'b', en:"About 15 minutes. What would you like today?", es:"Como 15 minutos. ¿Qué desea hoy?", pro:"abáut fiftin mínits. wát wud yu láik tudéi"},
+          {who:'a', en:"I'd like a haircut. Not too short, just a trim.", es:"Quisiera un corte. No muy corto, solo un recorte.", pro:"aid láik a jérkat. not tu short, chast a trim"},
+          {who:'b', en:"Of course! Do you want me to wash your hair first?", es:"¡Claro! ¿Quieres que te lave el cabello primero?", pro:"of kors! du yu wont mi tu wosh yor jer ferst"},
+          {who:'a', en:"Yes please. And a little shorter on the sides.", es:"Sí por favor. Y un poco más corto en los lados.", pro:"yes plís. and a lítol shorter on de sáids"},
+          {who:'b', en:"Perfect. Sit back and relax!", es:"Perfecto. ¡Siéntate y relájate!", pro:"pérfekt. sit bak and rilaks"},
+          {who:'a', en:"That looks great! How much do I owe you?", es:"¡Se ve genial! ¿Cuánto le debo?", pro:"dat luks gréit! jáu mach du ai ou yu"},
+          {who:'b', en:"That's $15. Cash or card?", es:"Son $15. ¿Efectivo o tarjeta?", pro:"dáts fiftin dólars. kash or kard"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'banco', label:'🏦 Banco', icon:'🏦',
+    desc:'Transacciones bancarias y trámites comunes',
+    tips:[
+      {en:"I'd like to open an account", pro:"aid láik tu óupen an akáunt", es:"Quisiera abrir una cuenta"},
+      {en:"I need to make a withdrawal", pro:"ai níd tu méik a wizdróal", es:"Necesito hacer un retiro"},
+      {en:"I'd like to deposit some money", pro:"aid láik tu dipózit sam máni", es:"Quisiera depositar dinero"},
+      {en:"What's the exchange rate?", pro:"wáts di exchéinch réit", es:"¿Cuál es la tasa de cambio?"},
+      {en:"My card was declined", pro:"mai kard wos dikláind", es:"Mi tarjeta fue rechazada"},
+      {en:"I lost my credit card", pro:"ai lost mai krédit kard", es:"Perdí mi tarjeta de crédito"},
+      {en:"What's the balance in my account?", pro:"wáts de bálans in mai akáunt", es:"¿Cuál es el saldo de mi cuenta?"},
+      {en:"Is there a fee for this?", pro:"is der a fi for dis", es:"¿Hay algún cargo por esto?"},
+    ],
+    scenarios:[
+      {
+        title:"💳 Trámite en el banco",
+        lines:[
+          {who:'b', en:"Good morning! How can I help you today?", es:"¡Buenos días! ¿En qué le puedo ayudar hoy?", pro:"gud mórnin! jáu kan ai jelp yu tudéi"},
+          {who:'a', en:"Hello. I'd like to make a withdrawal from my savings account.", es:"Hola. Quisiera hacer un retiro de mi cuenta de ahorros.", pro:"jelóu. aid láik tu méik a wizdróal from mai séivins akáunt"},
+          {who:'b', en:"Of course. Can I see your ID and account number?", es:"Claro. ¿Me puede mostrar su identificación y número de cuenta?", pro:"of kors. kan ai si yor ai di and akáunt nómber"},
+          {who:'a', en:"Here you go. I'd like to withdraw $200 please.", es:"Aquí tiene. Quisiera retirar $200 por favor.", pro:"jír yu gou. aid láik tu wizdró tu jándred dólars plís"},
+          {who:'b', en:"Certainly. In what bills would you like that?", es:"Por supuesto. ¿En qué denominaciones lo quiere?", pro:"sértenli. in wát bils wud yu láik dat"},
+          {who:'a', en:"Two hundreds please. Also, what's my current balance?", es:"Dos de cien por favor. También, ¿cuál es mi saldo actual?", pro:"tu jándreds plís. ólso, wáts mai kérent bálans"},
+          {who:'b', en:"Your balance is $1,450. Here is your cash. Have a great day!", es:"Su saldo es $1,450. Aquí está su efectivo. ¡Que tenga un gran día!", pro:"yor bálans is wan záusand for jándred fifti. jír is yor kash. jav a gréit déi"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'restaurante', label:'🍽 Restaurante', icon:'🍽',
+    desc:'Pedir comida, preguntar precios y más',
+    tips:[
+      {en:"A table for two, please", pro:"a téibol for tu, plís", es:"Una mesa para dos, por favor"},
+      {en:"Can I see the menu?", pro:"kan ai si de méniu", es:"¿Puedo ver el menú?"},
+      {en:"I would like...", pro:"ai wud láik", es:"Quisiera..."},
+      {en:"What do you recommend?", pro:"wát du yu rékamend", es:"¿Qué recomienda?"},
+      {en:"The bill, please", pro:"de bil, plís", es:"La cuenta, por favor"},
+      {en:"Is service included?", pro:"is sérvis inklúdid", es:"¿Está incluido el servicio?"},
+      {en:"I'm allergic to...", pro:"aim alérchik tu", es:"Soy alérgico a..."},
+      {en:"It's delicious!", pro:"its dilíshos", es:"¡Está delicioso!"},
+    ],
+    scenarios:[
+      {
+        title:"🥗 Pidiendo la orden",
+        lines:[
+          {who:'b', en:"Good evening! Welcome. How many people?", es:"¡Buenas noches! Bienvenidos. ¿Cuántas personas?", pro:"gud ívnin! wélkam. jáu méni pípol"},
+          {who:'a', en:"Two people, please. Do you have a table by the window?", es:"Dos personas, por favor. ¿Tienen mesa junto a la ventana?", pro:"tu pípol, plís. du yu jav a téibol bai de wíndou"},
+          {who:'b', en:"Of course! Right this way. Here is the menu.", es:"¡Claro! Por aquí. Aquí tiene el menú.", pro:"of kors! ráit dis wéi. jír is de méniu"},
+          {who:'a', en:"Thank you. What do you recommend today?", es:"Gracias. ¿Qué recomienda hoy?", pro:"zenk yu. wát du yu rékamend tudéi"},
+          {who:'b', en:"Our special today is grilled salmon with rice.", es:"Nuestro especial hoy es salmón a la parrilla con arroz.", pro:"áuer spéshal tudéi is grild sámon wid ráis"},
+          {who:'a', en:"That sounds great! I'll have that. And a glass of water, please.", es:"¡Suena genial! Tomaré eso. Y un vaso de agua, por favor.", pro:"dat sáunds gréit! ail jav dat. and a glas of wóter, plís"},
+          {who:'b', en:"Excellent choice! Anything else?", es:"¡Excelente elección! ¿Algo más?", pro:"éksalent chois! éniziŋ els"},
+          {who:'a', en:"No, that's all. Thank you very much!", es:"No, eso es todo. ¡Muchas gracias!", pro:"nou, dáts ol. zenk yu véri mach"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'doctor', label:'🏥 Doctor', icon:'🏥',
+    desc:'Describir síntomas y entender al médico',
+    tips:[
+      {en:"I don't feel well", pro:"ai dont fil wel", es:"No me siento bien"},
+      {en:"I have a headache", pro:"ai jav a jédeik", es:"Tengo dolor de cabeza"},
+      {en:"My stomach hurts", pro:"mai stómak jerts", es:"Me duele el estómago"},
+      {en:"I have a fever", pro:"ai jav a fíver", es:"Tengo fiebre"},
+      {en:"I'm allergic to...", pro:"aim alérchik tu", es:"Soy alérgico a..."},
+      {en:"Take this medicine twice a day", pro:"téik dis médisin twáis a déi", es:"Tome esta medicina dos veces al día"},
+      {en:"Since when?", pro:"sins wen", es:"¿Desde cuándo?"},
+      {en:"I need a prescription", pro:"ai níd a priskrípsion", es:"Necesito una receta"},
+    ],
+    scenarios:[
+      {
+        title:"🤒 Visita al médico",
+        lines:[
+          {who:'b', en:"Good morning! What seems to be the problem today?", es:"¡Buenos días! ¿Cuál parece ser el problema hoy?", pro:"gud mórnin! wát síms tu bi de próblem tudéi"},
+          {who:'a', en:"I don't feel well. I have a fever and a bad headache.", es:"No me siento bien. Tengo fiebre y un fuerte dolor de cabeza.", pro:"ai dont fil wel. ai jav a fíver and a bad jédeik"},
+          {who:'b', en:"I'm sorry. Since when do you have these symptoms?", es:"Lo siento. ¿Desde cuándo tiene estos síntomas?", pro:"aim sórri. sins wen du yu jav díis símptons"},
+          {who:'a', en:"Since yesterday morning. I also have a sore throat.", es:"Desde ayer por la mañana. También me duele la garganta.", pro:"sins iésterdei mórnin. ai ólso jav a sor zrout"},
+          {who:'b', en:"Are you allergic to any medicine?", es:"¿Es alérgico a algún medicamento?", pro:"ar yu alérchik tu éni médisin"},
+          {who:'a', en:"Yes, I'm allergic to penicillin.", es:"Sí, soy alérgico a la penicilina.", pro:"yes, aim alérchik tu penisílin"},
+          {who:'b', en:"OK. You have a throat infection. Take this antibiotic twice a day for 7 days.", es:"OK. Tiene una infección en la garganta. Tome este antibiótico dos veces al día por 7 días.", pro:"okéi. yu jav a zrout infékshon. téik dis antibáiotik twáis a déi for séven déis"},
+          {who:'a', en:"Should I rest at home?", es:"¿Debo descansar en casa?", pro:"shud ai rest at jóum"},
+          {who:'b', en:"Yes, rest for 2 days and drink plenty of water.", es:"Sí, descanse 2 días y tome mucha agua.", pro:"yes, rest for tu déis and drink plénti of wóter"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'aeropuerto', label:'✈️ Aeropuerto', icon:'✈️',
+    desc:'Viajar, vuelos y pasar por migración',
+    tips:[
+      {en:"Where is the check-in?", pro:"wer is de chek in", es:"¿Dónde está el check-in?"},
+      {en:"My flight is delayed", pro:"mai fláit is diléid", es:"Mi vuelo está retrasado"},
+      {en:"Window or aisle seat?", pro:"wíndou or áil sit", es:"¿Asiento de ventana o pasillo?"},
+      {en:"Do you have anything to declare?", pro:"du yu jav éniziŋ tu diklér", es:"¿Tiene algo que declarar?"},
+      {en:"My baggage is lost", pro:"mai bágich is lost", es:"Mi equipaje está perdido"},
+      {en:"What is the gate number?", pro:"wát is de géit nómber", es:"¿Cuál es el número de puerta?"},
+      {en:"Is this flight on time?", pro:"is dis fláit on táim", es:"¿Está a tiempo este vuelo?"},
+      {en:"I missed my flight", pro:"ai mist mai fláit", es:"Perdí mi vuelo"},
+    ],
+    scenarios:[
+      {
+        title:"🛫 En el aeropuerto",
+        lines:[
+          {who:'a', en:"Excuse me, where is the check-in for flight 205?", es:"Disculpe, ¿dónde está el check-in para el vuelo 205?", pro:"ekskiús mi, wer is de chek in for fláit tu ou faiv"},
+          {who:'b', en:"It's at counter C, on your right.", es:"Está en el mostrador C, a su derecha.", pro:"its at káunter si, on yor ráit"},
+          {who:'a', en:"Thank you! Is the flight on time?", es:"¡Gracias! ¿Está el vuelo a tiempo?", pro:"zenk yu! is de fláit on táim"},
+          {who:'b', en:"Yes, it departs at 3:45 PM from gate 12.", es:"Sí, sale a las 3:45 PM desde la puerta 12.", pro:"yes, it dipárts at zri forti faiv pi em from géit twelv"},
+          {who:'a', en:"Window or aisle seat, please?", es:"¿Ventana o pasillo, por favor?", pro:"wíndou or áil sit, plís"},
+          {who:'b', en:"Aisle. Do you have carry-on luggage only?", es:"Pasillo. ¿Solo tiene equipaje de mano?", pro:"áil. du yu jav kéri on lágich ónli"},
+          {who:'a', en:"No, I have one suitcase to check in.", es:"No, tengo una maleta para documentar.", pro:"nou, ai jav wan sútkeis tu chek in"},
+          {who:'b', en:"Perfect. Here's your boarding pass. Enjoy your flight!", es:"Perfecto. Aquí está su pase de abordar. ¡Buen vuelo!", pro:"pérfekt. jírs yor bórdin pas. enchói yor fláit"},
+        ]
+      }
+    ]
+  },
+  {
+    id:'emergencia', label:'🚨 Emergencias', icon:'🚨',
+    desc:'Frases vitales para situaciones de emergencia',
+    tips:[
+      {en:"Help!", pro:"jelp", es:"¡Ayuda!"},
+      {en:"Call the police!", pro:"kol de polís", es:"¡Llame a la policía!"},
+      {en:"Call an ambulance!", pro:"kol an ámbiulans", es:"¡Llame una ambulancia!"},
+      {en:"There's been an accident", pro:"ders bin an áksídent", es:"Hubo un accidente"},
+      {en:"I need help", pro:"ai níd jelp", es:"Necesito ayuda"},
+      {en:"It's an emergency", pro:"its an iméryensi", es:"Es una emergencia"},
+      {en:"I've been robbed", pro:"aiv bin robd", es:"Me han robado"},
+      {en:"I'm lost", pro:"aim lost", es:"Estoy perdido"},
+    ],
+    scenarios:[
+      {
+        title:"🚑 Llamando al 911",
+        lines:[
+          {who:'b', en:"911, what's your emergency?", es:"911, ¿cuál es su emergencia?", pro:"náin wan wan, wáts yor iméryensi"},
+          {who:'a', en:"Help! There's been a car accident on Main Street!", es:"¡Ayuda! ¡Hubo un accidente de carro en la calle Main!", pro:"jelp! ders bin a kar áksídent on méin strít"},
+          {who:'b', en:"Is anyone injured?", es:"¿Hay alguien herido?", pro:"is éniwon íncherrd"},
+          {who:'a', en:"Yes! A man is unconscious. He's not moving!", es:"¡Sí! Un hombre está inconsciente. ¡No se mueve!", pro:"yes! a man is ankónshes. jis not múvin"},
+          {who:'b', en:"Stay calm. Help is on the way. Don't move him.", es:"Cálmese. La ayuda está en camino. No lo mueva.", pro:"stéi kalm. jelp is on de wéi. dont muv jim"},
+          {who:'a', en:"Okay. There are two more people in the other car.", es:"Okay. Hay dos personas más en el otro carro.", pro:"okéi. der ar tu mor pípol in di áder kar"},
+          {who:'b', en:"Good. Stay on the line. The ambulance will be there in 3 minutes.", es:"Bien. Quédese en la línea. La ambulancia llegará en 3 minutos.", pro:"gud. stéi on de láin. di ámbiulans wil bi der in zri mínits"},
+        ]
+      }
+    ]
+  }
+];
+
+/* ─────────────────────────────────────────
+   BUILD UI
+   ─────────────────────────────────────────*/
+function buildNav() {
+  const nav = document.getElementById('nav');
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+      const sec = document.getElementById('sec-' + t.id);
+      if (sec) { sec.classList.add('active'); }
+    };
+    nav.appendChild(btn);
+  });
+}
+
+function buildSections() {
+  const main = document.getElementById('main');
+  TOPICS.forEach((topic, ti) => {
+    const sec = document.createElement('div');
+    sec.className = 'topic-section' + (ti === 0 ? ' active' : '');
+    sec.id = 'sec-' + topic.id;
+    main.appendChild(sec);
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'topic-header';
+    hdr.innerHTML = `<div class="topic-icon">${topic.icon}</div><div>
+      <div class="topic-title">${topic.label}</div>
+      <div class="topic-desc">${topic.desc}</div></div>`;
+    sec.appendChild(hdr);
+
+    // Tips
+    const tBlock = document.createElement('div');
+    tBlock.className = 'tips-block';
+    tBlock.innerHTML = '<div class="tips-block-title">🔑 Frases clave — toca para escuchar</div>';
+    topic.tips.forEach(tip => {
+      const card = document.createElement('div');
+      card.className = 'phrase-card';
+      card.innerHTML = `<div class="phrase-texts">
+        <div class="phrase-en">${tip.en}</div>
+        <div class="phrase-es">${tip.es}</div>
+        <div class="phrase-pro">🔊 ${tip.pro}</div>
+      </div><div class="play-icon">🔊</div>`;
+      card.onclick = () => speakOne(tip.en, card);
+      tBlock.appendChild(card);
+    });
+    sec.appendChild(tBlock);
+
+    // Scenarios
+    topic.scenarios.forEach((sc, si) => {
+      const scEl = document.createElement('div');
+      scEl.className = 'scenario open';
+
+      const scHdr = document.createElement('div');
+      scHdr.className = 'scenario-header';
+      scHdr.innerHTML = `<div class="scenario-title">${sc.title}</div><div class="chevron">▼</div>`;
+      scHdr.onclick = () => scEl.classList.toggle('open');
+      scEl.appendChild(scHdr);
+
+      const body = document.createElement('div');
+      body.className = 'scenario-body';
+
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.innerHTML = `<strong>💡 Cómo practicar:</strong> Toca cada burbuja para escucharla individualmente · Lee la <span style="color:var(--yellow)">pronunciación en amarillo</span> y repite en voz alta · Usa <strong>▶️ Escuchar todo</strong> para el diálogo completo`;
+      body.appendChild(hint);
+
+      const dial = document.createElement('div');
+      dial.className = 'dialogue';
+      const bubbleItems = [];
+
+      sc.lines.forEach(line => {
+        const lineEl = document.createElement('div');
+        lineEl.className = `line ${line.who}`;
+        const av = document.createElement('div');
+        av.className = 'avatar';
+        av.textContent = line.who === 'a' ? '👤' : '👥';
+        const bub = document.createElement('div');
+        bub.className = 'bubble';
+        bub.innerHTML = `<div class="bubble-en">${line.en}</div>
+          <div class="bubble-es">${line.es}</div>
+          <div class="bubble-pro">🔊 ${line.pro}</div>`;
+        bub.onclick = () => speakOne(line.en, bub);
+        bubbleItems.push({ text: line.en, el: bub });
+        lineEl.appendChild(av);
+        lineEl.appendChild(bub);
+        dial.appendChild(lineEl);
+      });
+
+      body.appendChild(dial);
+
+      const btnRow = document.createElement('div');
+      btnRow.className = 'btn-row';
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'speak-all-btn';
+      playBtn.innerHTML = '▶️ Escuchar todo el diálogo';
+      playBtn.onclick = () => speakAll(bubbleItems, playBtn);
+
+      const stopBtn = document.createElement('button');
+      stopBtn.className = 'stop-btn';
+      stopBtn.innerHTML = '⏹ Detener';
+      stopBtn.onclick = stopAll;
+
+      btnRow.appendChild(playBtn);
+      btnRow.appendChild(stopBtn);
+      body.appendChild(btnRow);
+      scEl.appendChild(body);
+      sec.appendChild(scEl);
+    });
+  });
+}
+
+// Asegurar ejecución correcta en WebView Android
+function initApp(){
+  try { buildNav(); } catch(e){ console.error('buildNav error:',e); }
+  try { buildSections(); } catch(e){ console.error('buildSections error:',e); }
+  try { buildAlphaNumbers(); } catch(e){ console.error('buildAlphaNumbers error:',e); }
+  try { buildExtraNav(); } catch(e){ console.error('buildExtraNav error:',e); }
+  // Activar primer tab
+  var firstBtn = document.querySelector('.nav-btn');
+  if(firstBtn) firstBtn.click();
+}
+
+// Inicializar app cuando el DOM esté listo
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// iOS/Android: voces solo disponibles tras interacción del usuario
+document.addEventListener('touchstart', () => { if (!voices.length) loadVoices(); }, { once: true });
+document.addEventListener('click', () => { if (!voices.length) loadVoices(); }, { once: true });
+
+/* ─── ABECEDARIO ─── */
+const ALPHABET = [
+  {l:'A',word:'Apple',pro:'ei'},    {l:'B',word:'Ball',pro:'bi'},
+  {l:'C',word:'Cat',pro:'si'},      {l:'D',word:'Dog',pro:'di'},
+  {l:'E',word:'Elephant',pro:'i'},  {l:'F',word:'Fish',pro:'ef'},
+  {l:'G',word:'Girl',pro:'yi'},     {l:'H',word:'House',pro:'eich'},
+  {l:'I',word:'Ice',pro:'ai'},      {l:'J',word:'Jump',pro:'yei'},
+  {l:'K',word:'Key',pro:'kei'},     {l:'L',word:'Lion',pro:'el'},
+  {l:'M',word:'Moon',pro:'em'},     {l:'N',word:'Night',pro:'en'},
+  {l:'O',word:'Orange',pro:'ou'},   {l:'P',word:'Pen',pro:'pi'},
+  {l:'Q',word:'Queen',pro:'kiú'},   {l:'R',word:'Rain',pro:'ar'},
+  {l:'S',word:'Sun',pro:'es'},      {l:'T',word:'Tree',pro:'ti'},
+  {l:'U',word:'Umbrella',pro:'iú'}, {l:'V',word:'Volcano',pro:'vi'},
+  {l:'W',word:'Water',pro:'dáboliu'},{l:'X',word:'X-ray',pro:'eks'},
+  {l:'Y',word:'Yellow',pro:'wai'},  {l:'Z',word:'Zebra',pro:'zi'},
+];
+const NUMBERS = [
+  {n:'0',en:'Zero',pro:'sírou'},        {n:'1',en:'One',pro:'wan'},
+  {n:'2',en:'Two',pro:'tu'},            {n:'3',en:'Three',pro:'zri'},
+  {n:'4',en:'Four',pro:'for'},          {n:'5',en:'Five',pro:'fáiv'},
+  {n:'6',en:'Six',pro:'síks'},          {n:'7',en:'Seven',pro:'séven'},
+  {n:'8',en:'Eight',pro:'éit'},         {n:'9',en:'Nine',pro:'náin'},
+  {n:'10',en:'Ten',pro:'ten'},          {n:'11',en:'Eleven',pro:'iléven'},
+  {n:'12',en:'Twelve',pro:'twelv'},     {n:'13',en:'Thirteen',pro:'zertín'},
+  {n:'14',en:'Fourteen',pro:'fortín'},  {n:'15',en:'Fifteen',pro:'fiftín'},
+  {n:'16',en:'Sixteen',pro:'síkstín'},  {n:'17',en:'Seventeen',pro:'séventín'},
+  {n:'18',en:'Eighteen',pro:'éitín'},   {n:'19',en:'Nineteen',pro:'náintín'},
+  {n:'20',en:'Twenty',pro:'twénti'},    {n:'21',en:'Twenty-one',pro:'twénti wan'},
+  {n:'22',en:'Twenty-two',pro:'twénti tu'},{n:'30',en:'Thirty',pro:'zérti'},
+  {n:'40',en:'Forty',pro:'fórti'},      {n:'50',en:'Fifty',pro:'fífti'},
+  {n:'60',en:'Sixty',pro:'síksti'},     {n:'70',en:'Seventy',pro:'séventi'},
+  {n:'80',en:'Eighty',pro:'éiti'},      {n:'90',en:'Ninety',pro:'náinti'},
+  {n:'100',en:'One hundred',pro:'wan jándred'}, {n:'200',en:'Two hundred',pro:'tu jándred'},
+  {n:'500',en:'Five hundred',pro:'faiv jándred'},{n:'1,000',en:'One thousand',pro:'wan záusand'},
+  {n:'1,000,000',en:'One million',pro:'wan mílion'},
+  {n:'1st',en:'First',pro:'ferst'},    {n:'2nd',en:'Second',pro:'sékond'},
+  {n:'3rd',en:'Third',pro:'zerd'},     {n:'4th',en:'Fourth',pro:'forz'},
+  {n:'5th',en:'Fifth',pro:'fifz'},     {n:'6th',en:'Sixth',pro:'síksz'},
+  {n:'7th',en:'Seventh',pro:'sévenz'}, {n:'8th',en:'Eighth',pro:'éitz'},
+  {n:'9th',en:'Ninth',pro:'náinz'},    {n:'10th',en:'Tenth',pro:'tenz'},
+  {n:'20th',en:'Twentieth',pro:'twéntiez'},{n:'100th',en:'Hundredth',pro:'jándredz'},
+];
+
+function buildAlphaNumbers() {
+  const main = document.getElementById('main');
+
+  // ── ABECEDARIO ──
+  const secA = document.createElement('div');
+  secA.className = 'topic-section';
+  secA.id = 'sec-abecedario';
+
+  const hdrA = document.createElement('div');
+  hdrA.className = 'topic-header';
+  hdrA.innerHTML = '<div class="topic-icon">🔤</div><div><div class="topic-title">🔤 El Abecedario</div><div class="topic-desc">Las 26 letras del inglés con pronunciación y ejemplo</div></div>';
+  secA.appendChild(hdrA);
+
+  const hintA = document.createElement('div');
+  hintA.className = 'hint';
+  hintA.style.marginBottom = '14px';
+  hintA.innerHTML = '<strong>💡 Cómo practicar:</strong> Toca cada letra para escucharla en inglés · La palabra ejemplo te ayuda a recordarla · Usa <strong>▶️ Escuchar todo</strong> para repasar';
+  secA.appendChild(hintA);
+
+  const rowA = document.createElement('div');
+  rowA.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px';
+  const playAllA = document.createElement('button');
+  playAllA.className = 'speak-all-alpha';
+  playAllA.innerHTML = '▶️ Escuchar todo el abecedario';
+  const stopAllA = document.createElement('button');
+  stopAllA.className = 'speak-all-alpha';
+  stopAllA.style.background = 'rgba(239,68,68,.2)';
+  stopAllA.style.boxShadow = 'none';
+  stopAllA.style.color = '#EF4444';
+  stopAllA.innerHTML = '⏹ Detener';
+  stopAllA.onclick = stopAll;
+  rowA.appendChild(playAllA);
+  rowA.appendChild(stopAllA);
+  secA.appendChild(rowA);
+
+  const gridA = document.createElement('div');
+  gridA.className = 'alpha-grid';
+  const alphaItems = [];
+  ALPHABET.forEach(({l, word, pro}) => {
+    const card = document.createElement('div');
+    card.className = 'alpha-card';
+    card.innerHTML = '<div class="alpha-letter">'+l+'</div><div class="alpha-word">'+word+'</div><div class="alpha-pro">'+pro+'</div>';
+    card.onclick = () => speakOne(l, card);
+    alphaItems.push({text: l, el: card});
+    gridA.appendChild(card);
+  });
+  playAllA.onclick = () => speakAll(alphaItems, playAllA);
+  secA.appendChild(gridA);
+  main.appendChild(secA);
+
+  // ── NÚMEROS ──
+  const secN = document.createElement('div');
+  secN.className = 'topic-section';
+  secN.id = 'sec-numeros';
+
+  const hdrN = document.createElement('div');
+  hdrN.className = 'topic-header';
+  hdrN.innerHTML = '<div class="topic-icon">🔢</div><div><div class="topic-title">🔢 Los Números</div><div class="topic-desc">Del 0 al millón, más números ordinales — toca para escuchar</div></div>';
+  secN.appendChild(hdrN);
+
+  const hintN = document.createElement('div');
+  hintN.className = 'hint';
+  hintN.style.marginBottom = '14px';
+  hintN.innerHTML = '<strong>💡 Cómo practicar:</strong> Toca cada número para escucharlo · Lee la <span style="color:var(--blue)">pronunciación en azul</span> y repite en voz alta';
+  secN.appendChild(hintN);
+
+  const rowN = document.createElement('div');
+  rowN.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px';
+  const playAllN = document.createElement('button');
+  playAllN.className = 'speak-all-alpha';
+  playAllN.innerHTML = '▶️ Escuchar todos los números';
+  const stopAllN = document.createElement('button');
+  stopAllN.className = 'speak-all-alpha';
+  stopAllN.style.background = 'rgba(239,68,68,.2)';
+  stopAllN.style.boxShadow = 'none';
+  stopAllN.style.color = '#EF4444';
+  stopAllN.innerHTML = '⏹ Detener';
+  stopAllN.onclick = stopAll;
+  rowN.appendChild(playAllN);
+  rowN.appendChild(stopAllN);
+  secN.appendChild(rowN);
+
+  const sub1 = document.createElement('div');
+  sub1.className = 'section-subtitle';
+  sub1.textContent = '📌 Números Cardinales (0 – 1,000,000)';
+  secN.appendChild(sub1);
+
+  const numGrid = document.createElement('div');
+  numGrid.className = 'num-grid';
+  const numItems = [];
+  const cardinals = NUMBERS.filter(x => !x.n.includes('st') && !x.n.includes('nd') && !x.n.includes('rd') && !x.n.includes('th'));
+  const ordinals  = NUMBERS.filter(x =>  x.n.includes('st') ||  x.n.includes('nd') ||  x.n.includes('rd') ||  x.n.includes('th'));
+
+  cardinals.forEach(({n, en, pro}) => {
+    const card = document.createElement('div');
+    card.className = 'num-card';
+    card.innerHTML = '<div class="num-digit">'+n+'</div><div class="num-texts"><div class="num-en">'+en+'</div><div class="num-pro">🔊 '+pro+'</div></div>';
+    card.onclick = () => speakOne(en, card);
+    numItems.push({text: en, el: card});
+    numGrid.appendChild(card);
+  });
+  secN.appendChild(numGrid);
+
+  const sub2 = document.createElement('div');
+  sub2.className = 'section-subtitle';
+  sub2.textContent = '📌 Números Ordinales (1st, 2nd, 3rd...)';
+  secN.appendChild(sub2);
+
+  const ordGrid = document.createElement('div');
+  ordGrid.className = 'num-grid';
+  ordinals.forEach(({n, en, pro}) => {
+    const card = document.createElement('div');
+    card.className = 'num-card';
+    card.innerHTML = '<div class="num-digit" style="font-size:1.1rem">'+n+'</div><div class="num-texts"><div class="num-en">'+en+'</div><div class="num-pro">🔊 '+pro+'</div></div>';
+    card.onclick = () => speakOne(en, card);
+    numItems.push({text: en, el: card});
+    ordGrid.appendChild(card);
+  });
+  secN.appendChild(ordGrid);
+  playAllN.onclick = () => speakAll(numItems, playAllN);
+  main.appendChild(secN);
+}
+
+// Nav buttons for alphabet & numbers — ahora dentro de initApp
+function buildExtraNav(){
+  const nav = document.getElementById('nav');
+  if(!nav) return;
+  [{id:'abecedario', label:'🔤 Abecedario'}, {id:'numeros', label:'🔢 Números'}].forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn';
+    btn.textContent = item.label;
+    btn.onclick = () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+      const sec = document.getElementById('sec-'+item.id);
+      if (sec) sec.classList.add('active');
+    };
+    nav.appendChild(btn);
+  });
+}
+
+</script>
+</body>
+</html>
